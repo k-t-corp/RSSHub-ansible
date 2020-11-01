@@ -1,0 +1,38 @@
+-
+  name: Install RSSHub
+  tasks:
+    -
+      name: Install GPG keys for repos
+      apt_key:
+        name: '{{ item }}'
+        state: present
+      with_items:
+        - https://deb.nodesource.com/gpgkey/nodesource.gpg.key
+        - https://dl.yarnpkg.com/debian/pubkey.gpg
+    -
+      name: Install repos
+      apt_repository:
+        repo: '{{ item }}'
+        state: present
+      with_items:
+        - deb https://deb.nodesource.com/12 focal main
+        - deb https://dl.yarnpkg.com/debian/ stable main
+    -
+      name: Install prerequisites
+      apt:
+        name: '{{ item }}'
+        state: present
+      with_items:
+        - nodejs
+        - yarn
+    -
+      name: Clone the repo
+      git:
+        repo: https://github.com/DIYgod/RSSHub.git
+        dest: /home/rsshub/app
+        update: yes
+    -
+      name: Install RSSHub dependencies
+      command: yarn install --production
+      args:
+        chdir: /home/rsshub/app
