@@ -1,10 +1,12 @@
 -
   name: Install RSSHub
+  hosts: localhost
+  become: true
   tasks:
     -
       name: Install GPG keys for repos
       apt_key:
-        name: '{{ item }}'
+        url: '{{ item }}'
         state: present
       with_items:
         - https://deb.nodesource.com/gpgkey/nodesource.gpg.key
@@ -14,17 +16,22 @@
       apt_repository:
         repo: '{{ item }}'
         state: present
+        update_cache: yes
       with_items:
-        - deb https://deb.nodesource.com/12 focal main
+        - deb https://deb.nodesource.com/node_12.x focal main
         - deb https://dl.yarnpkg.com/debian/ stable main
     -
       name: Install prerequisites
       apt:
-        name: '{{ item }}'
+        name: ['nodejs', 'yarn', 'build-essential', 'python-is-python2']
         state: present
-      with_items:
-        - nodejs
-        - yarn
+        update_cache: yes
+    -
+      name: Create the user
+      user:
+        name: rsshub
+        create_home: true
+        shell: /bin/bash
     -
       name: Clone the repo
       git:
@@ -32,7 +39,14 @@
         dest: /home/rsshub/app
         update: yes
     -
-      name: Install RSSHub dependencies
+      name: Install repo dependencies
       command: yarn install --production
       args:
         chdir: /home/rsshub/app
+    -
+      name: Own repo to the user
+      file:
+        path: /home/rsshub/app
+        owner: rsshub
+        group: rsshub
+        recurse: yes
