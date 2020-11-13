@@ -23,9 +23,16 @@
     -
       name: Install prerequisites
       apt:
-        name: ['nodejs', 'yarn', 'build-essential', 'python-is-python2']
+        name: ['nodejs', 'yarn', 'build-essential', 'python-is-python2', "redis-server"]
         state: present
         update_cache: yes
+    -
+      name: Start redis
+      systemd:
+        state: started
+        enabled: yes
+        name: redis
+        daemon_reload: yes
     -
       name: Create the user
       user:
@@ -44,6 +51,11 @@
       args:
         chdir: /home/rsshub/app
     -
+      name: Copy configuration
+      template:
+        src: rsshub.env
+        dest: /home/rsshub/app/.env
+    -
       name: Own repo to the user
       file:
         path: /home/rsshub/app
@@ -59,5 +71,6 @@
       name: Start the systemd service
       systemd:
         state: started
+        enabled: yes
         name: rsshub
         daemon_reload: yes
