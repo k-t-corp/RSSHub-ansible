@@ -50,3 +50,14 @@
         owner: rsshub
         group: rsshub
         recurse: yes
+    -
+      name: Install the systemd unit
+      template:
+        src: rsshub.service
+        dest: /etc/systemd/system/rsshub.service
+    -
+      name: Start the systemd service
+      systemd:
+        state: started
+        name: rsshub
+        daemon_reload: yes
