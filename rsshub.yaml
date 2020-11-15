@@ -23,7 +23,7 @@
     -
       name: Install prerequisites
       apt:
-        name: ['nodejs', 'yarn', 'build-essential', 'python-is-python2', "redis-server"]
+        name: ['nodejs', 'yarn', 'build-essential', 'python-is-python2', "redis-server", "nginx"]
         state: present
         update_cache: yes
     -
@@ -32,6 +32,29 @@
         state: started
         enabled: yes
         name: redis
+        daemon_reload: yes
+    -
+      name: Copy nginx configuration
+      copy:
+        src: rsshub.nginx.cfg
+        dest: /etc/nginx/sites-available/rsshub
+    -
+      name: Create nginx configuration symlink
+      file:
+        src: /etc/nginx/sites-available/rsshub
+        dest: /etc/nginx/sites-enabled/rsshub
+        state: link
+    -
+      name: Remove default nginx configuration symlink
+      file:
+        path: /etc/nginx/sites-enabled/default
+        state: absent
+    -
+      name: Start nginx
+      systemd:
+        state: started
+        enabled: yes
+        name: nginx
         daemon_reload: yes
     -
       name: Create the user
@@ -52,7 +75,7 @@
         chdir: /home/rsshub/app
     -
       name: Copy configuration
-      template:
+      copy:
         src: rsshub.env
         dest: /home/rsshub/app/.env
     -
@@ -64,7 +87,7 @@
         recurse: yes
     -
       name: Install the systemd unit
-      template:
+      copy:
         src: rsshub.service
         dest: /etc/systemd/system/rsshub.service
     -
