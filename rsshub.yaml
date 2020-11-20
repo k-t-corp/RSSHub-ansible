@@ -2,6 +2,11 @@
   name: Install RSSHub
   hosts: localhost
   become: true
+  vars_prompt:
+    -
+      name: nginx_server_name
+      prompt: What is the hostname (without www, e.g. example.com)?
+      private: no
   tasks:
     -
       name: Check OS
@@ -40,7 +45,7 @@
         daemon_reload: yes
     -
       name: Copy nginx configuration
-      copy:
+      template:
         src: rsshub.nginx.cfg
         dest: /etc/nginx/sites-available/rsshub
     -
