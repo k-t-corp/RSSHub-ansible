@@ -1,6 +1,5 @@
 # RSSHub-ansible
-
-Ansible to deploy [RSSHub](https://github.com/DIYgod/RSSHub) on bare-metal
+Ansible playbook to deploy [RSSHub](https://github.com/DIYgod/RSSHub) on bare-metal
 
 
 ## Usage
