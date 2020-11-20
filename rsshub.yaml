@@ -4,6 +4,11 @@
   become: true
   tasks:
     -
+      name: Check OS
+      fail:
+        msg: This playbook can only be run on Ubuntu 20.04 at this moment
+      when: ansible_distribution != 'Ubuntu' or ansible_distribution_version !='20.04'
+    -
       name: Install GPG keys for repos
       apt_key:
         url: '{{ item }}'
