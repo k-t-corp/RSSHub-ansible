@@ -133,7 +133,7 @@
     -
       name: Start the systemd service
       systemd:
-        state: started
+        state: restarted
         enabled: yes
         name: rsshub
         daemon_reload: yes
