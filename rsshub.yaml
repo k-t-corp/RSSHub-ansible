@@ -4,8 +4,8 @@
   become: true
   vars_prompt:
     -
-      name: nginx_server_name
-      prompt: What is the hostname (without www, e.g. example.com)?
+      name: domain_name
+      prompt: What is the domain name (without www, e.g. rsshub.example.com)? Use "http://localhost" for development in Vagrant VM.
       private: no
   tasks:
     -
@@ -22,6 +22,7 @@
         - https://deb.nodesource.com/gpgkey/nodesource.gpg.key
         - https://dl.yarnpkg.com/debian/pubkey.gpg
         - https://download.docker.com/linux/ubuntu/gpg
+        - https://dl.cloudsmith.io/public/caddy/stable/cfg/gpg/gpg.155B6D79CA56EA34.key
     -
       name: Install repos
       apt_repository:
@@ -32,6 +33,7 @@
         - deb https://deb.nodesource.com/node_12.x focal main
         - deb https://dl.yarnpkg.com/debian/ stable main
         - deb https://download.docker.com/linux/ubuntu focal stable
+        - deb https://dl.cloudsmith.io/public/caddy/stable/deb/debian any-version main
     -
       name: Install prerequisites
       apt:
@@ -41,11 +43,11 @@
           - build-essential
           - python-is-python2
           - redis-server
-          - nginx
           - docker-ce
           - python3-pip
           - virtualenv
           - python3-setuptools
+          - caddy
         state: present
         update_cache: yes
     -
@@ -60,32 +62,21 @@
     -
       name: Start redis
       systemd:
-        state: started
+        state: restarted
         enabled: yes
         name: redis
         daemon_reload: yes
     -
-      name: Copy nginx configuration
+      name: Copy caddy configuration
       template:
-        src: rsshub.nginx.cfg
-        dest: /etc/nginx/sites-available/rsshub
+        src: rsshub.Caddyfile
+        dest: /etc/caddy/Caddyfile
     -
-      name: Create nginx configuration symlink
-      file:
-        src: /etc/nginx/sites-available/rsshub
-        dest: /etc/nginx/sites-enabled/rsshub
-        state: link
-    -
-      name: Remove default nginx configuration symlink
-      file:
-        path: /etc/nginx/sites-enabled/default
-        state: absent
-    -
-      name: Start nginx
+      name: Start caddy
       systemd:
-        state: started
+        state: restarted
         enabled: yes
-        name: nginx
+        name: caddy
         daemon_reload: yes
     -
       name: Create and start browserless container
