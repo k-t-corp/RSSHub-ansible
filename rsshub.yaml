@@ -21,6 +21,7 @@
       with_items:
         - https://deb.nodesource.com/gpgkey/nodesource.gpg.key
         - https://dl.yarnpkg.com/debian/pubkey.gpg
+        - https://download.docker.com/linux/ubuntu/gpg
     -
       name: Install repos
       apt_repository:
@@ -30,12 +31,32 @@
       with_items:
         - deb https://deb.nodesource.com/node_12.x focal main
         - deb https://dl.yarnpkg.com/debian/ stable main
+        - deb https://download.docker.com/linux/ubuntu focal stable
     -
       name: Install prerequisites
       apt:
-        name: ['nodejs', 'yarn', 'build-essential', 'python-is-python2', "redis-server", "nginx"]
+        name:
+          - nodejs
+          - yarn
+          - build-essential
+          - python-is-python2
+          - redis-server
+          - nginx
+          - docker-ce
+          - python3-pip
+          - virtualenv
+          - python3-setuptools
         state: present
         update_cache: yes
+    -
+      name: Install python module for docker
+      pip:
+        name: docker
+    -
+      name: Pull docker image for browserless
+      docker_image:
+        name: browserless/chrome
+        source: pull
     -
       name: Start redis
       systemd:
@@ -66,6 +87,15 @@
         enabled: yes
         name: nginx
         daemon_reload: yes
+    -
+      name: Create and start browserless container
+      docker_container:
+        name: browserless
+        image: browserless/chrome
+        state: started
+        restart_policy: always
+        published_ports:
+          - "3000:3000"
     -
       name: Create the user
       user:
@@ -103,7 +133,7 @@
     -
       name: Start the systemd service
       systemd:
-        state: started
+        state: restarted
         enabled: yes
         name: rsshub
         daemon_reload: yes
