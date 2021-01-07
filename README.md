@@ -1,5 +1,5 @@
 # RSSHub-ansible
-Ansible playbook to deploy [RSSHub](https://github.com/DIYgod/RSSHub) on bare-metal
+Ansible playbook to deploy [RSSHub](https://github.com/DIYgod/RSSHub) on bare-metal with Redis, browserless and Caddy 2
 
 
 ## Usage
