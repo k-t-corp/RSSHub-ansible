@@ -1,3 +1,7 @@
+**Deprecated**
+
+This repo is deprecated in favor of [Ansible playbook in RSSHub upstream](https://github.com/DIYgod/RSSHub/tree/master/scripts/ansible)
+
 # RSSHub-ansible
 Ansible playbook to deploy [RSSHub](https://github.com/DIYgod/RSSHub) on bare-metal with Redis, browserless and Caddy 2
 
